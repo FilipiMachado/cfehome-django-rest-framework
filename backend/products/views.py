@@ -5,5 +5,7 @@ from .serializers import ProductSerializer
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer()
+    serializer_class = ProductSerializer
     # lookup_field = 'pk'
+    
+product_detail_view = ProductDetailAPIView().as_view()
