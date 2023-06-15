@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -36,13 +36,13 @@ product_detail_view = ProductDetailAPIView().as_view()
 class ProductUpdateAPIView(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'pk'
-    
+    lookup_field = "pk"
+
     def perform_update(self, serializer):
         instance = serializer.save()
         if not instance.content:
             instance.content = instance.title
-            # 
+            #
 
 
 product_update_view = ProductUpdateAPIView().as_view()
@@ -51,12 +51,11 @@ product_update_view = ProductUpdateAPIView().as_view()
 class ProductDeleteAPIView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'pk'
-    
+    lookup_field = "pk"
+
     def perform_destroy(self, instance):
         # instance
-         super().perform_destroy(instance)
-
+        super().perform_destroy(instance)
 
 
 product_delete_view = ProductDeleteAPIView().as_view()
@@ -73,6 +72,24 @@ class ProductListAPIView(generics.ListAPIView):
 product_list_view = ProductListAPIView().as_view()
 
 
+class ProductMixinView(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, generics.GenericAPIView
+):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = "pk"
+
+    def get(self, request, *args, **kwargs):
+        print(args, kwargs)
+        return self.list(request, *args, **kwargs)
+
+    """ def post():
+        pass """
+
+
+product_mixin_view = ProductMixinView().as_view()
+
+
 @api_view(["GET", "POST"])
 def product_alt_view(request, pk=None, *args, **kwargs):
     method = request.method
@@ -84,8 +101,8 @@ def product_alt_view(request, pk=None, *args, **kwargs):
             data = ProductSerializer(obj, many=False).data
             return Response(data)
         # list view
-        qs = Product.objects.all()
-        data = ProductSerializer(qs, many=True).data
+        queryset = Product.objects.all()
+        data = ProductSerializer(queryset, many=True).data
         return Response(data)
 
     if method == "POST":
