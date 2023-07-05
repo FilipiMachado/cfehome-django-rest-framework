@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+from api.authentication import TokenAuthentication
+
 from .models import Product
 from .permissions import IsStaffEditorPermission
 from .serializers import ProductSerializer
@@ -13,7 +15,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     authentication_classes = [
         authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
+        TokenAuthentication,
     ]
     permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
@@ -22,7 +24,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         print(serializer.validated_data)
         title = serializer.validated_data.get("title")
         content = serializer.validated_data.get("content") or None
-        if content in None:
+        if content is None:
             content = title
         serializer.save(content=content)
 
