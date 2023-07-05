@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from api.authentication import TokenAuthentication
 
 from .models import Product
-from .permissions import IsStaffEditorPermission
+from ..api.permissions import IsStaffEditorPermission
 from .serializers import ProductSerializer
 
 
